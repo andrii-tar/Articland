@@ -1,0 +1,634 @@
+openapi: 3.0.3
+info:
+  title: Swagger lab - OpenAPI 3.0
+  description: "Lab 5"
+  
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: https://swagger.io/api/v3
+tags:
+  - name: article
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+      
+  - name: article_version
+    description: All articles content
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+      
+  - name: user
+    description: Operations about user
+    
+  - name: guest_permission
+  - name: user_permission
+  - name: moderator_permission
+  - name: admin_permission
+  
+
+paths:
+  
+  /article/:
+    get:
+      tags:
+        - article
+        - guest_permission
+      summary: View list of all articles
+      parameters: 
+        - in: query
+          name: intitle
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: intext
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: author
+          schema:
+            type: string
+          required: false
+        - in: query
+          name: moderator
+          schema:
+            type: string
+          required: false   
+          
+      responses:
+        200:
+          $ref: '#/components/responses/articles'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+    
+    post:
+      tags:
+        - article
+        - user_permission
+      summary: Create new article
+      responses:
+        200:
+          $ref: '#/components/responses/article'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+  
+  /article/{articleID}:
+    parameters:
+       - $ref: '#/components/parameters/articleID'
+    
+    get:
+      tags:
+        - article
+        - guest_permission
+      summary: View last approved verion of article
+      responses:
+        200:
+          $ref: '#/components/responses/article_version'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+    
+    
+    
+    delete:
+      tags:
+        - article
+        - moderator_permission
+      summary: Delete article
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+          
+          
+          
+  /article/{articleID}/version/all:
+    parameters:
+       - $ref: '#/components/parameters/articleID'
+    
+    get:
+      tags:
+        - article_version 
+        - guest_permission
+      summary: View list of all versions of article
+      responses:
+        200:
+          $ref: '#/components/responses/article_versions'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+          
+  /article/version/:
+    post:
+      tags:
+        - article_version 
+        - user_permission
+      summary: Post article version
+      requestBody:
+        description: Edited version
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Article_body'
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+  /article/{articleID}/version/{versionID}:
+    parameters:
+       - $ref: '#/components/parameters/articleID'
+       - $ref: '#/components/parameters/versionID'
+    
+    get:
+      tags:
+        - article_version 
+        - guest_permission
+      summary: View article version
+      responses:
+        200:
+          $ref: '#/components/responses/article_version'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+  
+    
+    put:
+      tags:
+        - article_version 
+        - moderator_permission
+      summary: Manage current version
+      parameters:
+        - in: query
+          name: action
+          schema:
+            type: string
+            enum: [accept, decline, return]
+          required: true
+      requestBody:
+        description: comment
+        content:
+          application/json:
+            schema: 
+              type: string
+              
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+  
+
+
+  
+  
+  /user:
+    post:
+      tags:
+        - user
+        - guest_permission
+      summary: Create user
+      requestBody:
+        description: Created user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+              
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+ 
+    get:
+      tags:
+        - user
+        - user_permission
+      summary: View user info
+      responses:
+        200: 
+          $ref: '#/components/responses/user'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+    
+    put:
+      tags:
+        - user
+      summary: Change user info
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+            
+    delete:
+      tags:
+        - user
+        - user_permission
+      summary: Delete user
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+          
+  /user/login:
+    post:
+      tags:
+        - user
+        - guest_permission
+      summary: Logs user into the system
+      requestBody:
+        description: Created user
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+          
+  /user/logout:
+    get:
+      tags:
+        - user
+        - user_permission
+      summary: Logs out current logged in user session
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+          
+  /user/{userID}:
+    parameters:
+      - $ref: '#/components/parameters/userID'
+    post:
+      tags:
+        - user
+        - admin_permission
+      summary: Block or unblock user
+      parameters:
+        - in: query
+          name: action
+          schema:
+            type: string
+            enum: [block, unblock, setrole]
+          required: true
+        - in: query
+          name: role
+          schema:
+            $ref: '#/components/schemas/Role'
+          required: false
+        
+      responses:
+        200:
+          $ref: '#/components/responses/200'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+          
+    get:
+      tags:
+        - user
+        - admin_permission
+      summary: View user profile
+      responses:
+        200:
+          $ref: '#/components/responses/user'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+            
+  /queue:
+    get:
+      tags:
+        - article_version
+        - moderator_permission
+      summary: View list of all articles for comfirmation
+      responses:
+        200:
+          $ref: '#/components/responses/articles'
+        400:
+          $ref: '#/components/responses/400'
+        401:
+          $ref: '#/components/responses/401'
+        403:
+          $ref: '#/components/responses/403'
+        500:
+          $ref: '#/components/responses/500'
+        default:
+          $ref: '#/components/responses/default'
+            
+components:
+  schemas:
+  
+
+    Role:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: '1'
+        title:
+          type: string
+          example: Moderator
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: '10'
+        username:
+          type: string
+          example: theUser
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: bad_password
+        userStatus:
+          $ref: '#/components/schemas/Role'
+  
+        
+    Article:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        title:
+          type: string
+        current_version_id:
+          type: integer
+          format: int64
+        rating:
+          type: number
+          format: float
+        rates_cnt:
+          type: integer
+          format: int64
+      xml:
+        name: article
+        
+    Article_version:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        article_id:
+          type: integer
+          format: int64
+        author_id:
+          type: integer
+          format: int64
+        moderator_id:
+          type: integer
+          format: int64
+        schema:
+          $ref: '#/components/schemas/Article_body'
+        Status:
+          enum: 
+            [acepted, declined, on_review]
+   
+    Article_body:
+      type: object
+      properties:
+        title:
+          type: string
+        text:
+          type: string
+        base_article:
+          type: integer
+    
+   
+  parameters:
+    articleID:
+      name: articleID
+      in: path
+      description: 'The id of the current article'
+      required: true
+      schema:
+        type: integer
+        
+    versionID:
+      name: versionID
+      in: path
+      description: 'The id of the version of article that needs to be edited'
+      required: true
+      schema:
+        type: integer
+        
+    userID:
+      name: userID
+      in: path
+      required: true
+      description: Numeric ID of the user to get
+      schema:
+        type: integer
+    
+  requestBodies:
+   
+    
+    UserArray:
+      description: List of user object
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/User'
+  
+  
+  responses:
+  
+    '200':
+      description: Ok
+      
+    '400':
+      description: Bad request
+     
+    '401':
+      description: Authorization information is missing or invalid.
+      
+    '403':
+      description: Forbidden
+     
+    '500':
+      description: Internal Server Error
+
+    default:
+      description: Unexpected error
+
+    'article':
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Article'
+            
+    'article_version':
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Article_version'
+            
+    'article_versions':
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Article_version'
+            
+    'user':
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+            
+    'articles':
+      description: successful operation
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/Article'
+
+  securitySchemes:
+    
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
